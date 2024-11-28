@@ -4,6 +4,7 @@ const userRouter = require('./routes/userRouter');
 require("dotenv").config()
 const cors = require('cors');
 const path = require("path");
+const productRouter = require('./routes/product.router');
 
 const app = express()
 
@@ -17,7 +18,7 @@ app.get("/",(req,res)=>{
 });
 
 app.use("/user",userRouter)
-
+app.use("/product",productRouter)
 
 
 const PORT = process.env.PORT || 8090;

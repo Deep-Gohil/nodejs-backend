@@ -112,15 +112,20 @@ const deleteMany = async (req, res) => {
 const VerifyUser = async (req, res) => {
   let { token, otp } = req.params;
   try {
-    let decode = jwt.verify(token, "Private-Key");
+    let decode = await jwt.verify(token, "Private-Key");
+    
+    if(!decode){
+      return res.status(403).json({ msg: "err" });
+    }
     let oldOtp = otps.get(decode.email);
 
     if (oldOtp == otp) {
-      await User.findByIdAndUpdate(decode.id, { isVerified: true });
-      otps.delete(decode.email); // Clear OTP after verification
-
-      // Redirect to client index.html
-      return res.redirect("/index.html");
+      let data = await User.findByIdAndUpdate(
+        decode.id,
+        {isVerified:true},
+        {new:true}
+      );
+      res.ststus(200).json({msg:"verified",data})
     } else {
       return res.status(403).json({ msg: "Invalid OTP" });
     }
@@ -129,6 +134,28 @@ const VerifyUser = async (req, res) => {
   }
 };
 
+const getAdmins = async (req, res) => {
+  try {
+    let data = await User.find({ role: "ADMIN" });
+    res.status(202).json(data); 
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
 
 
-module.exports = { Signup, Login, GetAllUsers, GetUser, DeleteUser, VerifyUser, deleteMany };
+const verifyAdmin = async (req, res) => {
+  let { adminId } = req.params;
+  try {
+    let user = await User.findByIdAndUpdate(
+      adminId,
+      { isVerified: true },
+      { new: true }
+    );
+    res.status(200).json({ msg: "verified" }, { user });
+  } catch (error) {
+    res.status(404).json({ err: error.message });
+  }
+};
+
+module.exports = { Signup, Login, GetAllUsers, GetUser, DeleteUser, VerifyUser, deleteMany,getAdmins,verifyAdmin };
