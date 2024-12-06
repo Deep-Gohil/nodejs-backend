@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/userSchema");
 const sendMail = require("../services/sendMail");
-const otps = new Map();
 
 const Signup = async (req, res) => {
   let { email, password } = req.body;
@@ -30,6 +29,7 @@ const Signup = async (req, res) => {
          <h1>Hello ${user.username}</h1>
          <p>Click the link below to verify your account:</p>
          <a href="http://localhost:8090/user/verify/${token}/${otp}">Verify Account</a>
+         <h1>OTP: ${otp}</h1>
       </div>`;
       await sendMail(email, "Verify your account", html);
 
@@ -109,6 +109,8 @@ const deleteMany = async (req, res) => {
   }
 };
 
+const otps = new Map();
+
 const VerifyUser = async (req, res) => {
   let { token, otp } = req.params;
   try {
@@ -125,7 +127,7 @@ const VerifyUser = async (req, res) => {
         {isVerified:true},
         {new:true}
       );
-      res.ststus(200).json({msg:"verified",data})
+      res.status(200).json({msg:"verified",data})
     } else {
       return res.status(403).json({ msg: "Invalid OTP" });
     }

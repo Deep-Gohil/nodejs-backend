@@ -6,7 +6,7 @@ const productRouter = Router()
 
 productRouter.get("/all",getAllProducts)
 
-productRouter.post("/",upload.single("image"),createProduct)
+productRouter.post("/create",upload.single("image"),createProduct)
 productRouter.patch("/update/:id",updateProduct)
 productRouter.delete("/delete/:id",deleteProduct)
 
